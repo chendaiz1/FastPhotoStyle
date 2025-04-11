@@ -11,7 +11,9 @@ import torchvision.transforms as transforms
 import torchvision.utils as utils
 import torch.nn as nn
 import torch
-from smooth_filter import smooth_filter
+
+# Do not use smooth_filter which requires GPU (by Chendai 250411)
+# from smooth_filter import smooth_filter
 
 
 class ReMapping:
@@ -113,9 +115,10 @@ def stylization(stylization_module, smoothing_module, content_image_path, style_
                 print("NotImplemented: The CPU version of smooth filter has not been implemented currently.")
                 return
 
-            if no_post is False:
-                with Timer("Elapsed time in post processing: %f"):
-                    out_img = smooth_filter(output_image_path, content_image_path, f_radius=15, f_edge=1e-1)
+            # Do not use smooth_filter which requires GPU (by Chendai 250411)
+            # if no_post is False:
+            #     with Timer("Elapsed time in post processing: %f"):
+            #         out_img = smooth_filter(output_image_path, content_image_path, f_radius=15, f_edge=1e-1)
             out_img.save(output_image_path)
         else:
             with Timer("Elapsed time in stylization: %f"):
@@ -130,8 +133,9 @@ def stylization(stylization_module, smoothing_module, content_image_path, style_
             with Timer("Elapsed time in propagation: %f"):
                 out_img = smoothing_module.process(out_img, cont_pilimg)
 
-            if no_post is False:
-                with Timer("Elapsed time in post processing: %f"):
-                    out_img = smooth_filter(out_img, cont_pilimg, f_radius=15, f_edge=1e-1)
+            # Do not use smooth_filter which requires GPU (by Chendai 250411)
+            # if no_post is False:
+            #     with Timer("Elapsed time in post processing: %f"):
+            #         out_img = smooth_filter(out_img, cont_pilimg, f_radius=15, f_edge=1e-1)
             out_img.save(output_image_path)
 
