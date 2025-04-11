@@ -35,14 +35,6 @@ pip install scipy==1.2.1
 python demo.py --content_image_path examples/content/in34.png --style_image_path examples/style/in34.png --output_image_path examples/results/result34.png --cuda 0
 ```
 
-### What's new
- 
- | Date     | News |
- |----------|--------------|
- |2018-07-25| Migrate to pytorch 0.4.0. For pytorch 0.3.0 user, check out [FastPhotoStyle for pytorch 0.3.0](https://github.com/NVIDIA/FastPhotoStyle/releases/tag/f33e07f). |
- |          | Add a [tutorial](TUTORIAL.md) showing 3 ways of using the FastPhotoStyle algorithm.|
- |2018-07-10| Our paper is accepted by the ECCV 2018 conference!!! | 
-
 
 ### About
 
