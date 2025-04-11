@@ -11,6 +11,30 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 <img src="https://raw.githubusercontent.com/NVIDIA/FastPhotoStyle/master/teaser.png" width="800" title="Teaser results"> 
 
 
+### Setup environment
+```bash
+cd FastPhotoStyle
+conda create -n cv python==3.7
+conda activate cv
+python -m pip install --upgrade pip
+pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
+pip install cupy-cuda11x
+conda install -c conda-forge scikit-umfpack
+pip install -U setuptools
+cd ..
+pip download pynvrtc==9.2 --no-deps
+tar -xzvf pynvrtc-9.2.tar.gz
+cd pynvrtc-9.2
+pip install .
+cd ../FastPhotoStyle
+pip install scipy==1.2.1
+```
+
+
+### Run using CPU
+python demo.py --content_image_path examples/content/in34.png --style_image_path examples/style/in34.png --output_image_path examples/results/result34.png --cuda 0
+
+
 ### What's new
  
  | Date     | News |
