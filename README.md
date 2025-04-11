@@ -30,10 +30,10 @@ cd ../FastPhotoStyle
 pip install scipy==1.2.1
 ```
 
-
 ### Run using CPU
+```bash
 python demo.py --content_image_path examples/content/in34.png --style_image_path examples/style/in34.png --output_image_path examples/results/result34.png --cuda 0
-
+```
 
 ### What's new
  
