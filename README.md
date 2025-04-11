@@ -30,7 +30,9 @@ cd ../FastPhotoStyle
 pip install scipy==1.2.1
 ```
 
-### Run using CPU
+### Run on CPU
+
+##### Without segmentation
 ```bash
 python demo.py --content_image_path pictures/content/in34.png --style_image_path pictures/style/in34.png --output_image_path pictures/results/result34.png --cuda 0
 ```
