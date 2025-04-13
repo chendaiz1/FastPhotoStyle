@@ -56,6 +56,7 @@ class PhotoWCT(nn.Module):
     def rgb2gray(self, rgb):
         r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
         gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+        gray = gray.astype(np.uint8)
         return gray
 
     def __compute_label_info(self, cont_seg, styl_seg):
@@ -63,7 +64,7 @@ class PhotoWCT(nn.Module):
             return
         
         # Convert rbg to gray
-        if len(cont_seg.shape) >= 3:
+        if len(cont_seg.shape) == 3:
             cont_seg = self.rgb2gray(cont_seg)
             print("Converted cont_seg from rbg to gray")
         if len(styl_seg.shape) >= 3:
