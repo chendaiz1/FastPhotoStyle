@@ -53,7 +53,7 @@ class PhotoWCT(nn.Module):
         Im1 = self.d1(csF1)
         return Im1
     
-    def rgb2gray(rgb):
+    def rgb2gray(self, rgb):
         r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
         gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
         return gray
