@@ -54,6 +54,7 @@ class PhotoWCT(nn.Module):
         return Im1
     
     def rgb2gray(self, rgb):
+        """Convert rgb to gray scale (by Chendai 25/4/13)"""
         r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
         gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
         gray = gray.astype(np.uint8)
@@ -63,7 +64,7 @@ class PhotoWCT(nn.Module):
         if cont_seg.size == False or styl_seg.size == False:
             return
         
-        # Convert rbg to gray
+        # Convert rbg to gray (by Chendai 25/4/13)
         if len(cont_seg.shape) == 3:
             cont_seg = self.rgb2gray(cont_seg)
             print("Converted cont_seg from rbg to gray")
@@ -88,7 +89,7 @@ class PhotoWCT(nn.Module):
         cont_feat_view = cont_feat.view(cont_c, -1).clone()
         styl_feat_view = styl_feat.view(styl_c, -1).clone()
 
-        # Convert rbg to gray
+        # Convert rbg to gray (by Chendai 25/4/13)
         if len(cont_seg.shape) == 3:
             cont_seg = self.rgb2gray(cont_seg)
             print("Converted cont_seg from rbg to gray")
@@ -103,13 +104,13 @@ class PhotoWCT(nn.Module):
             if len(cont_seg.shape) == 2:
                 t_cont_seg = np.asarray(Image.fromarray(cont_seg).resize((cont_w, cont_h), Image.NEAREST))
             else:
-                # Remove attribute mode='RGB'
+                # Remove attribute mode='RGB' (by Chendai 25/4/13)
                 # t_cont_seg = np.asarray(Image.fromarray(cont_seg, mode='RGB').resize((cont_w, cont_h), Image.NEAREST))
                 t_cont_seg = np.asarray(Image.fromarray(cont_seg).resize((cont_w, cont_h), Image.NEAREST))
             if len(styl_seg.shape) == 2:
                 t_styl_seg = np.asarray(Image.fromarray(styl_seg).resize((styl_w, styl_h), Image.NEAREST))
             else:
-                # Remove attribute mode='RGB'
+                # Remove attribute mode='RGB' (by Chendai 25/4/13)
                 # t_styl_seg = np.asarray(Image.fromarray(styl_seg, mode='RGB').resize((styl_w, styl_h), Image.NEAREST))
                 t_styl_seg = np.asarray(Image.fromarray(styl_seg).resize((styl_w, styl_h), Image.NEAREST))
 
@@ -172,7 +173,9 @@ class PhotoWCT(nn.Module):
         s_mean = torch.mean(styl_feat, 1)
         styl_feat = styl_feat - s_mean.unsqueeze(1).expand_as(styl_feat)
         styleConv = torch.mm(styl_feat, styl_feat.t()).div(sFSize[1] - 1)
-        s_u, s_e, s_v = torch.svd(styleConv, some=False)
+        # Use torch.linalg.svd instead (by Chendai 25/4/13)
+        # s_u, s_e, s_v = torch.svd(styleConv, some=False)
+        s_u, s_e, s_v = torch.linalg.svd(styleConv, full_matrices=False)
         
         k_s = sFSize[0]
         for i in range(sFSize[0] - 1, -1, -1):
