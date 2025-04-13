@@ -149,9 +149,7 @@ class PhotoWCT(nn.Module):
         s_mean = torch.mean(styl_feat, 1)
         styl_feat = styl_feat - s_mean.unsqueeze(1).expand_as(styl_feat)
         styleConv = torch.mm(styl_feat, styl_feat.t()).div(sFSize[1] - 1)
-        # Use torch.linalg.svd instead (by Chendai 25/4/13)
         s_u, s_e, s_v = torch.svd(styleConv, some=False)
-        # s_u, s_e, s_v = torch.linalg.svd(styleConv, full_matrices=False)
         
         k_s = sFSize[0]
         for i in range(sFSize[0] - 1, -1, -1):
