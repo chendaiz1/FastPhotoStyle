@@ -88,6 +88,14 @@ class PhotoWCT(nn.Module):
         cont_feat_view = cont_feat.view(cont_c, -1).clone()
         styl_feat_view = styl_feat.view(styl_c, -1).clone()
 
+        # Convert rbg to gray
+        if len(cont_seg.shape) == 3:
+            cont_seg = self.rgb2gray(cont_seg)
+            print("Converted cont_seg from rbg to gray")
+        if len(styl_seg.shape) >= 3:
+            styl_seg = self.rgb2gray(styl_seg)
+            print("Converted styl_seg from rbg to gray")
+
         if cont_seg.size == False or styl_seg.size == False:
             target_feature = self.__wct_core(cont_feat_view, styl_feat_view)
         else:
