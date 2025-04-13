@@ -37,6 +37,10 @@ pip install scipy==1.2.1
 python demo.py --content_image_path pictures/content/in34.png --style_image_path pictures/style/in34.png --output_image_path pictures/results/result34.png --cuda 0
 ```
 
+##### With segmentation
+```bash
+python demo.py --content_image_path pictures/content/in34.png --content_seg_path pictures/content_segment/in34.png --style_image_path pictures/style/in34.png --style_seg_path pictures/style_segment/in34.png --output_image_path pictures/results/result34.png --cuda 0
+```
 
 ### About
 
