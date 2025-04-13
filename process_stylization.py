@@ -7,7 +7,8 @@ import time
 import numpy as np
 from PIL import Image
 from torch.autograd import Variable
-import torchvision.transforms as transforms
+# import torchvision.transforms as transforms
+from torchvision import transforms
 import torchvision.utils as utils
 import torch.nn as nn
 import torch
@@ -59,6 +60,58 @@ def memory_limit_image_resize(cont_img):
     return cont_img.width, cont_img.height
 
 
+def change_seg(seg):
+    """Map rgb to labels (Copy from WCT2 by Chendai 25/4/13)"""
+    color_dict = {
+        (0, 0, 255): 3,  # blue
+        (0, 255, 0): 2,  # green
+        (0, 0, 0): 0,  # black
+        (255, 255, 255): 1,  # white
+        (255, 0, 0): 4,  # red
+        (255, 255, 0): 5,  # yellow
+        (128, 128, 128): 6,  # grey
+        (0, 255, 255): 7,  # lightblue
+        (255, 0, 255): 8  # purple
+    }
+    arr_seg = np.asarray(seg)
+    new_seg = np.zeros(arr_seg.shape[:-1])
+    for x in range(arr_seg.shape[0]):
+        for y in range(arr_seg.shape[1]):
+            if tuple(arr_seg[x, y, :]) in color_dict:
+                new_seg[x, y] = color_dict[tuple(arr_seg[x, y, :])]
+            else:
+                min_dist_index = 0
+                min_dist = 99999
+                for key in color_dict:
+                    dist = np.sum(np.abs(np.asarray(key) - arr_seg[x, y, :]))
+                    if dist < min_dist:
+                        min_dist = dist
+                        min_dist_index = color_dict[key]
+                    elif dist == min_dist:
+                        try:
+                            min_dist_index = new_seg[x, y-1, :]
+                        except Exception:
+                            pass
+                new_seg[x, y] = min_dist_index
+    return new_seg.astype(np.uint8)
+
+
+def load_segment(image_path, image_size=None):
+    """Load segment (Copy from WCT2 by Chendai 25/4/13)"""
+    if not image_path:
+        return np.asarray([])
+    image = Image.open(image_path)
+    if image_size is not None:
+        transform = transforms.Resize(image_size, interpolation=Image.NEAREST)
+        image = transform(image)
+    w, h = image.size
+    transform = transforms.CenterCrop((h // 16 * 16, w // 16 * 16))
+    image = transform(image)
+    if len(np.asarray(image).shape) == 3:
+        image = change_seg(image)
+    return np.asarray(image)
+
+
 def stylization(stylization_module, smoothing_module, content_image_path, style_image_path, content_seg_path, style_seg_path, output_image_path,
                 cuda, save_intermediate, no_post, cont_seg_remapping=None, styl_seg_remapping=None):
     # Load image
@@ -71,15 +124,19 @@ def stylization(stylization_module, smoothing_module, content_image_path, style_
         cont_pilimg = cont_img.copy()
         cw = cont_pilimg.width
         ch = cont_pilimg.height
-        try:
-            cont_seg = Image.open(content_seg_path)
-            styl_seg = Image.open(style_seg_path)
-            cont_seg.resize((new_cw,new_ch),Image.NEAREST)
-            styl_seg.resize((new_sw,new_sh),Image.NEAREST)
 
-        except:
-            cont_seg = []
-            styl_seg = []
+        # Load segment (by Chendai 25/4/13)
+        cont_seg = load_segment(content_seg_path, (new_cw,new_ch))
+        styl_seg = load_segment(style_seg_path, (new_sw,new_sh))
+        # try:
+        #     cont_seg = Image.open(content_seg_path)
+        #     styl_seg = Image.open(style_seg_path)
+        #     cont_seg.resize((new_cw,new_ch),Image.NEAREST)
+        #     styl_seg.resize((new_sw,new_sh),Image.NEAREST)
+
+        # except:
+        #     cont_seg = []
+        #     styl_seg = []
 
         cont_img = transforms.ToTensor()(cont_img).unsqueeze(0)
         styl_img = transforms.ToTensor()(styl_img).unsqueeze(0)
@@ -92,12 +149,12 @@ def stylization(stylization_module, smoothing_module, content_image_path, style_
         # cont_img = Variable(cont_img, volatile=True)
         # styl_img = Variable(styl_img, volatile=True)
 
-        cont_seg = np.asarray(cont_seg)
-        styl_seg = np.asarray(styl_seg)
-        if cont_seg_remapping is not None:
-            cont_seg = cont_seg_remapping.process(cont_seg)
-        if styl_seg_remapping is not None:
-            styl_seg = styl_seg_remapping.process(styl_seg)
+        # cont_seg = np.asarray(cont_seg)
+        # styl_seg = np.asarray(styl_seg)
+        # if cont_seg_remapping is not None:
+        #     cont_seg = cont_seg_remapping.process(cont_seg)
+        # if styl_seg_remapping is not None:
+        #     styl_seg = styl_seg_remapping.process(styl_seg)
 
         if save_intermediate:
             with Timer("Elapsed time in stylization: %f"):
