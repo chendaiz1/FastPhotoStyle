@@ -52,10 +52,24 @@ class PhotoWCT(nn.Module):
         csF1 = self.__feature_wct(cF1, sF1, cont_seg, styl_seg)
         Im1 = self.d1(csF1)
         return Im1
+    
+    def rgb2gray(rgb):
+        r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
+        gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+        return gray
 
     def __compute_label_info(self, cont_seg, styl_seg):
         if cont_seg.size == False or styl_seg.size == False:
             return
+        
+        # Convert rbg to gray
+        if len(cont_seg.shape) >= 3:
+            cont_seg = self.rgb2gray(cont_seg)
+            print("Converted cont_seg from rbg to gray")
+        if len(styl_seg.shape) >= 3:
+            styl_seg = self.rgb2gray(styl_seg)
+            print("Converted styl_seg from rbg to gray")
+
         max_label = np.max(cont_seg) + 1
         self.label_set = np.unique(cont_seg)
         self.label_indicator = np.zeros(max_label)
