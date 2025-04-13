@@ -52,26 +52,10 @@ class PhotoWCT(nn.Module):
         csF1 = self.__feature_wct(cF1, sF1, cont_seg, styl_seg)
         Im1 = self.d1(csF1)
         return Im1
-    
-    def rgb2gray(self, rgb):
-        """Convert rgb to gray scale (by Chendai 25/4/13)"""
-        r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
-        gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
-        gray = gray.astype(np.uint8)
-        return gray
 
     def __compute_label_info(self, cont_seg, styl_seg):
         if cont_seg.size == False or styl_seg.size == False:
             return
-        
-        # # Convert rbg to gray (by Chendai 25/4/13)
-        # if len(cont_seg.shape) == 3:
-        #     cont_seg = self.rgb2gray(cont_seg)
-        #     print("Converted cont_seg from rbg to gray")
-        # if len(styl_seg.shape) >= 3:
-        #     styl_seg = self.rgb2gray(styl_seg)
-        #     print("Converted styl_seg from rbg to gray")
-
         max_label = np.max(cont_seg) + 1
         self.label_set = np.unique(cont_seg)
         self.label_indicator = np.zeros(max_label)
@@ -88,14 +72,6 @@ class PhotoWCT(nn.Module):
         styl_c, styl_h, styl_w = styl_feat.size(0), styl_feat.size(1), styl_feat.size(2)
         cont_feat_view = cont_feat.view(cont_c, -1).clone()
         styl_feat_view = styl_feat.view(styl_c, -1).clone()
-
-        # # Convert rbg to gray (by Chendai 25/4/13)
-        # if len(cont_seg.shape) == 3:
-        #     cont_seg = self.rgb2gray(cont_seg)
-        #     print("Converted cont_seg from rbg to gray")
-        # if len(styl_seg.shape) >= 3:
-        #     styl_seg = self.rgb2gray(styl_seg)
-        #     print("Converted styl_seg from rbg to gray")
 
         if cont_seg.size == False or styl_seg.size == False:
             target_feature = self.__wct_core(cont_feat_view, styl_feat_view)
